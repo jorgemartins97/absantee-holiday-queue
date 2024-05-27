@@ -32,15 +32,27 @@ var rabbitMqPort = config["RabbitMq:Port"];
 var rabbitMqUser = config["RabbitMq:UserName"];
 var rabbitMqPass = config["RabbitMq:Password"];
 
+var DBConnectionString = config.GetConnectionString("DefaultConnection");
+
 // Add services to the container.
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<AbsanteeContext>(opt =>
-    //opt.UseInMemoryDatabase("AbsanteeList")
-    //opt.UseSqlite("Data Source=AbsanteeDatabase.sqlite")
-    opt.UseSqlite(Host.CreateApplicationBuilder().Configuration.GetConnectionString(queueName))
-    );
+// builder.Services.AddDbContext<AbsanteeContext>(opt =>
+//     //opt.UseInMemoryDatabase("AbsanteeList")
+//     //opt.UseSqlite("Data Source=AbsanteeDatabase.sqlite")
+//     opt.UseSqlite(Host.CreateApplicationBuilder().Configuration.GetConnectionString(queueName))
+//     );
+
+builder.Services.AddDbContext<AbsanteeContext>(option =>
+{
+    option.UseNpgsql(DBConnectionString);
+}, optionsLifetime: ServiceLifetime.Singleton);
+
+builder.Services.AddDbContextFactory<AbsanteeContext>(options =>
+{
+    options.UseNpgsql(DBConnectionString);
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
