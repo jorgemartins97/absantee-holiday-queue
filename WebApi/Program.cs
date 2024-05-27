@@ -47,12 +47,12 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AbsanteeContext>(option =>
 {
     option.UseNpgsql(DBConnectionString);
-}, optionsLifetime: ServiceLifetime.Singleton);
+}, optionsLifetime: ServiceLifetime.Scoped);
 
-builder.Services.AddDbContextFactory<AbsanteeContext>(options =>
-{
-    options.UseNpgsql(DBConnectionString);
-});
+// builder.Services.AddDbContextFactory<AbsanteeContext>(options =>
+// {
+//     options.UseNpgsql(DBConnectionString);
+// });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
