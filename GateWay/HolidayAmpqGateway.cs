@@ -7,6 +7,7 @@ public class HolidayAmpqGateway
     private readonly IConnection _connection;
     private readonly IModel _channel;
     public HolidayAmpqGateway(IConnectionFactory factory)
+    
     {
         _factory = factory;
         _connection = _factory.CreateConnection();
