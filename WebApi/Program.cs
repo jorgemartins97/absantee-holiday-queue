@@ -12,6 +12,7 @@ using WebApi.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 var config = builder.Configuration;
 string replicaNameArg = Array.Find(args, arg => arg.Contains("--replicaName"));
 string replicaName;
@@ -20,39 +21,30 @@ if (replicaNameArg != null)
 else
     replicaName = config.GetConnectionString("replicaName");
 
+replicaName = "Repl1";
+
 
 var queueName = config["Queues:" + replicaName];
-
-//var port = getPort(holidayQueueName);
-
+ 
 var port = config["Ports:" + replicaName];
 
-var rabbitMqHost = config["RabbitMq:Host"];
-var rabbitMqPort = config["RabbitMq:Port"];
-var rabbitMqUser = config["RabbitMq:UserName"];
-var rabbitMqPass = config["RabbitMq:Password"];
+Console.WriteLine("Environment Development: " + config["ASPNETCORE_ENVIRONMENT"]);
+Console.WriteLine("DB_CONNECTION: " + config["DB_CONNECTION"]);
+ 
+string dbConnectionString = config.DefineDbConnection();
+Console.WriteLine("DBConnectionString: " + dbConnectionString);
+ 
+RabbitMqConfiguration rabbitMqConfig = config.DefineRabbitMqConfiguration();
+Console.WriteLine("RabbitMqConfig: " + rabbitMqConfig.Hostname);
 
-var DBConnectionString = config.GetConnectionString("DefaultConnection");
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-
-// builder.Services.AddDbContext<AbsanteeContext>(opt =>
-//     //opt.UseInMemoryDatabase("AbsanteeList")
-//     //opt.UseSqlite("Data Source=AbsanteeDatabase.sqlite")
-//     opt.UseSqlite(Host.CreateApplicationBuilder().Configuration.GetConnectionString(queueName))
-//     );
 
 builder.Services.AddDbContext<AbsanteeContext>(option =>
 {
-    option.UseNpgsql(DBConnectionString);
+    option.UseNpgsql(dbConnectionString);
 }, optionsLifetime: ServiceLifetime.Scoped);
-
-// builder.Services.AddDbContextFactory<AbsanteeContext>(options =>
-// {
-//     options.UseNpgsql(DBConnectionString);
-// });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -80,10 +72,9 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
 {
     return new ConnectionFactory()
     {
-        HostName = rabbitMqHost,
-        Port = int.Parse(rabbitMqPort),
-        UserName = rabbitMqUser,
-        Password = rabbitMqPass
+        HostName = rabbitMqConfig.Hostname,
+        UserName = rabbitMqConfig.Username,
+        Password = rabbitMqConfig.Password
     };
 });
 
@@ -113,11 +104,11 @@ foreach (var service in rabbitMQConsumerServices)
 };
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+// if (app.Environment.IsDevelopment())
+// {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+// }
 
 app.UseCors("AllowAllOrigins");
 
@@ -125,17 +116,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-
 app.MapControllers();
 
-app.Run($"https://localhost:{port}");
+app.Run();
 
-/*int getPort(string name)
-{
-    // Implement logic to map queue name to a unique port number
-    // Example: Assign a unique port number based on the queue name suffix
-    int basePort = 5100; // Start from port 5000
-    int queueIndex = int.Parse(name.Substring(2)); // Extract the numeric part of the queue name
-    return basePort + queueIndex;
-}*/
 public partial class Program{ }
