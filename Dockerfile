@@ -9,6 +9,8 @@ COPY DataModel/DataModel.csproj ./DataModel/
 COPY Domain/Domain.csproj ./Domain/
 COPY WebApi/WebApi.csproj ./WebApi/
 COPY GateWay/GateWay.csproj ./GateWay/
+COPY Domain.Tests/Domain.Tests.csproj ./Domain.Tests/
+COPY WebApi.IntegrationTests/WebApi.IntegrationTests.csproj ./WebApi/
 
 # Restore dependencies for all projects
 RUN dotnet restore

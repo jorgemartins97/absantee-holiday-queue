@@ -74,7 +74,8 @@ builder.Services.AddSingleton<IConnectionFactory>(sp =>
     {
         HostName = rabbitMqConfig.Hostname,
         UserName = rabbitMqConfig.Username,
-        Password = rabbitMqConfig.Password
+        Password = rabbitMqConfig.Password,
+        Port = int.Parse(rabbitMqConfig.Port.ToString())
     };
 });
 
