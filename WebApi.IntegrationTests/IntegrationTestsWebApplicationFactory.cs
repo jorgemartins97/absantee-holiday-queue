@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using DataModel.Repository;
+using DotNet.Testcontainers.Configurations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
@@ -80,6 +81,8 @@ public class IntegrationTestsWebApplicationFactory<TProgram> : WebApplicationFac
     }
     public async Task InitializeAsync()
     {
+        TestcontainersSettings.ResourceReaperEnabled = false;
+
         _rabbitMqContainer = new RabbitMqBuilder()
             .WithImage("rabbitmq:3.13-management")
             .WithPortBinding(5672, true)
